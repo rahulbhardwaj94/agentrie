@@ -1,5 +1,7 @@
 # agentrie
 
+[![CI](https://github.com/rahulbhardwaj94/agentrie/actions/workflows/ci.yml/badge.svg)](https://github.com/rahulbhardwaj94/agentrie/actions/workflows/ci.yml)
+
 A distributed, multi-agent **orchestration & observability platform** built on
 NestJS 11, AWS SQS/SNS (via LocalStack locally), Redis, MongoDB, and
 OpenTelemetry.
@@ -86,6 +88,17 @@ deterministic `FakeLlmProvider` is used automatically.
 ---
 
 ## Quick start
+
+**Two ways to run, by how much you want to spin up:**
+
+| Goal | Command | Needs Docker? |
+| --- | --- | --- |
+| **Just verify it works** | `npm ci && npm run build && npm test` | ❌ No — the suite stubs Redis/Mongo/SQS |
+| **See it run live** | `npm run infra:up && npm run demo` | ✅ Yes — one command brings up the whole stack |
+
+The four backing services (Redis, Mongo, LocalStack, Jaeger) are all bundled in
+[`docker-compose.yml`](./docker-compose.yml); the only host prerequisite for the
+live demo is Docker. No AWS account and no API key are ever required.
 
 ```bash
 # 1. Install
