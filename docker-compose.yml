@@ -1,0 +1,54 @@
+# Local dev stack for agentrie. Brings up everything needed to run Phase 0/1
+# end-to-end with NO real AWS account:
+#   - redis:    hot token-aware window + locks
+#   - mongo:    durable session audit (source of truth)
+#   - localstack: SQS + SNS (Phase 2)
+#   - jaeger:   OTLP trace collector + UI (Phase 3) at http://localhost:16686
+#
+# Usage:
+#   docker compose up -d
+#   bash scripts/localstack-init.sh   # provision queues/topic (+ DLQ + redrive)
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  mongo:
+    image: mongo:7
+    ports:
+      - '27017:27017'
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=sqs,sns
+      - DEBUG=0
+      - AWS_DEFAULT_REGION=us-east-1
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Jaeger all-in-one. OTLP HTTP exposed on 4318 (matches OTEL_EXPORTER_OTLP_ENDPOINT).
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - '16686:16686' # Jaeger UI
+      - '4318:4318' # OTLP HTTP
+      - '4317:4317' # OTLP gRPC

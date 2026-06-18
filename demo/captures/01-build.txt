@@ -1,0 +1,7 @@
+$ npm run build
+
+> agentrie@0.1.0 build
+> nest build
+
+
+[exit 0]

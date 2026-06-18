@@ -1,0 +1,31 @@
+$ npm run eval -- run seed --report
+
+  CASE                      STATUS          SCORE RESULT
+  qa-greeting               completed       100%  PASS 
+  qa-exact                  completed       100%  PASS 
+  qa-contains-multi         completed       100%  PASS 
+  qa-system-prompt          completed       100%  PASS 
+  qa-long                   completed       100%  PASS 
+  numeric-total-pass        completed       100%  PASS 
+  numeric-tolerance-pass    completed       100%  PASS 
+  status-completed-pass     completed       100%  PASS 
+  multi-criteria-pass       completed       100%  PASS 
+  rubric-pass               completed       100%  PASS 
+  iteration-budget-pass     completed       100%  PASS 
+  tool-budget-zero-pass     completed       100%  PASS 
+  token-budget-pass         completed       100%  PASS 
+  combined-budget-pass      completed       100%  PASS 
+  tool-under-budget-pass    max_tool_calls  100%  PASS 
+  no-error-spans-pass       completed       100%  PASS 
+  contains-fail             completed       67%   FAIL ✗ contains
+  exact-fail                completed       50%   FAIL ✗ exact-match
+  numeric-fail              completed       50%   FAIL ✗ numeric-tolerance
+  status-mismatch-fail      max_iterations  50%   FAIL ✗ status
+  forbidden-tool-fail       max_iterations  67%   FAIL ✗ forbidden-tool
+  tool-budget-fail          max_iterations  67%   FAIL ✗ tool-call-budget
+  iteration-budget-fail     max_iterations  67%   FAIL ✗ iteration-budget
+  token-budget-fail         max_iterations  67%   FAIL ✗ token-budget
+  AGGREGATE 86.8%   PASS RATE 66.7% (16/24)
+  json:   /Users/rahulbhardwaj/Documents/Personal/Projects/agentrie/evals/reports/run-seed-1781602228817-40a56f1c.json
+  report: /Users/rahulbhardwaj/Documents/Personal/Projects/agentrie/evals/reports/run-seed-1781602228817-40a56f1c.html
+  ✓ run gate passed

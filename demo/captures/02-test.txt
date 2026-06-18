@@ -1,0 +1,19 @@
+$ npm test
+
+PASS test/gating.spec.ts
+PASS test/redlock.service.spec.ts
+PASS test/tool-scope.spec.ts
+PASS test/read-file.tool.spec.ts
+PASS test/agent-runner.spec.ts
+PASS test/tail-sampling.spec.ts
+PASS test/eval.spec.ts
+PASS test/observability.spec.ts
+PASS test/sandbox.spec.ts
+PASS test/redis-memory.store.spec.ts
+PASS test/summarization.worker.spec.ts
+PASS test/sqs-poison-pill.spec.ts
+Test Suites: 12 passed, 12 total
+Tests:       88 passed, 88 total
+Snapshots:   0 total
+Time:        3.995 s, estimated 4 s
+Ran all test suites.

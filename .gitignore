@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+npm-debug.log*
+.DS_Store
+localstack-volume/
+
+# Generated eval artifacts (HTML/JSON reports). Datasets under evals/datasets/ are tracked.
+evals/reports/
+
+# Demo proof: the clean captures (demo/captures/*.txt) and rendered screenshots
+# (demo/screenshots/*.png) are TRACKED. The verbose raw logs are not.
+demo/captures/*.full.txt
+demo/captures/server.log

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Compare — seed</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--fg:#e6edf3;--muted:#8b949e;
+--ok:#2ea043;--bad:#da3633;--na:#6e7681;--accent:#1f6feb;}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:var(--bg);color:var(--fg)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+header{padding:24px 28px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{margin:0 0 8px;font-size:22px}.ver{color:var(--muted);font-weight:400;font-size:14px}
+.meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);margin-bottom:16px}
+.meta code{color:var(--fg)}
+.scorecards{display:flex;gap:14px;flex-wrap:wrap}
+.card{padding:12px 16px;border-radius:10px;border:1px solid var(--line);min-width:140px;background:var(--bg)}
+.card.good{border-color:#1f4d2b}.card.warn{border-color:#5c2a26}
+.card-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.card-value{font-size:22px;font-weight:600;margin-top:2px}
+.card-sub{font-size:12px;color:var(--muted)}
+.bigdelta{font-size:16px;font-weight:600;margin:14px 0 0}.bigdelta.ok{color:var(--ok)}.bigdelta.bad{color:var(--bad)}
+main{padding:20px 28px;max-width:1100px}
+.case{margin:0 0 10px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.case.f{border-color:#5c2a26}
+summary{display:flex;gap:12px;align-items:center;cursor:pointer;padding:12px 16px;list-style:none}
+summary::-webkit-details-marker{display:none}
+.cid{font-weight:600}.status{color:var(--muted);font-size:12px}
+.cscore{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted)}
+.answer{padding:8px 16px;color:var(--fg);border-top:1px solid var(--line)}
+.err{color:#ff7b72;padding:4px 16px;margin:0}
+.muted{color:var(--muted);padding:8px 16px}
+table.scorers{width:calc(100% - 32px);margin:10px 16px;border-collapse:collapse;font-size:13px}
+table.scorers th,table.scorers td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.scorers th{color:var(--muted);font-weight:500}
+.detail{color:var(--muted)}
+.trace{padding:6px 16px 14px}.trace h4{margin:8px 0 6px;color:var(--muted);font-weight:500}
+ul.spantree,.spantree ul{list-style:none;margin:0;padding-left:18px;border-left:1px solid var(--line)}
+ul.spantree{padding-left:6px;border:none}
+.spantree li{padding:3px 0}
+.span-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.span-dot.ok{background:var(--ok)}.span-dot.bad{background:var(--bad)}.span-dot.na{background:var(--na)}
+.span-name{color:var(--fg)}.span-dur{color:var(--muted);font-size:12px;margin:0 8px}
+.attr{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:5px;
+padding:0 6px;margin-left:5px;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
+.pill.ok{background:var(--ok)}.pill.bad{background:var(--bad)}.pill.na{background:var(--na)}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.block{margin:0 0 22px}.block h2{font-size:16px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.block.reg h2{color:#ff7b72}.block.imp h2{color:#3fb950}
+.diffcard{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--panel)}
+.diffcard.regression{border-color:#5c2a26}.diffcard.improvement{border-color:#1f4d2b}
+.dc-head{display:flex;gap:10px;align-items:center}.dc-head .cscore{margin-left:auto}
+ul.moves{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+table.diff{width:100%;border-collapse:collapse;font-size:13px}
+table.diff th,table.diff td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.diff th{color:var(--muted);font-weight:500}
+tr.regression{background:rgba(218,54,51,.08)}tr.improvement{background:rgba(46,160,67,.08)}
+.up{color:var(--ok)}.down{color:var(--bad)}
+footer{padding:18px 28px;color:var(--muted);border-top:1px solid var(--line);font-size:12px}
+</style>
+</head><body>
+      <header>
+        <h1>Compare — seed <span class="ver">v1.0.0</span></h1>
+        <div class="meta">
+          <span>baseline <strong>tight</strong> <code>seed-1781395067492-3f495605</code></span>
+          <span>candidate <strong>loose</strong> <code>seed-1781395067549-55de6ca3</code></span>
+        </div>
+        <div class="scorecards">
+          <div class="card warn">
+    <div class="card-label">Aggregate</div>
+    <div class="card-value">80.2% → 79.2%</div>
+    <div class="card-sub">-1.0pp</div>
+  </div>
+          <div class="card good">
+    <div class="card-label">Pass rate</div>
+    <div class="card-value">62.5% → 62.5%</div>
+    <div class="card-sub">0.0pp</div>
+  </div>
+          <div class="card good">
+    <div class="card-label">Regressions</div>
+    <div class="card-value">0</div>
+    
+  </div>
+          <div class="card good">
+    <div class="card-label">Improvements</div>
+    <div class="card-value">0</div>
+    
+  </div>
+        </div>
+        <p class="bigdelta bad">▼ -1.0pp aggregate</p>
+      </header><main><section class="block"><h2>No regressions 🎉</h2></section><section class="block">
+        <h2>All cases</h2>
+        <table class="diff">
+          <thead><tr><th>case</th><th>baseline</th><th>candidate</th><th>Δscore</th><th>moved scorers</th></tr></thead>
+          <tbody><tr class="unchanged">
+      <td><code>qa-greeting</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>qa-exact</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>qa-contains-multi</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>qa-system-prompt</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>qa-long</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>numeric-total-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>numeric-tolerance-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>status-completed-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>multi-criteria-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>rubric-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>iteration-budget-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>tool-budget-zero-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>token-budget-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>combined-budget-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="score-down">
+      <td><code>tool-under-budget-pass</code></td>
+      <td><span class="pill bad">F</span> 75.0%</td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td class="down">-25.0pp</td>
+      <td class="detail">iteration-budget</td>
+    </tr><tr class="unchanged">
+      <td><code>no-error-spans-pass</code></td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td><span class="pill ok">P</span> 100.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>contains-fail</code></td>
+      <td><span class="pill bad">F</span> 66.7%</td>
+      <td><span class="pill bad">F</span> 66.7%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>exact-fail</code></td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>numeric-fail</code></td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>status-mismatch-fail</code></td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td><span class="pill bad">F</span> 50.0%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>forbidden-tool-fail</code></td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>tool-budget-fail</code></td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>iteration-budget-fail</code></td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr><tr class="unchanged">
+      <td><code>token-budget-fail</code></td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td><span class="pill bad">F</span> 33.3%</td>
+      <td class="up">0.0pp</td>
+      <td class="detail">—</td>
+    </tr></tbody>
+        </table>
+      </section></main><footer>Generated by agentrie eval layer — traced + measured.</footer></body></html>

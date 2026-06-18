@@ -1,0 +1,15 @@
+$ npm run eval -- compare seed --baseline default \
+    --candidate '{"maxToolCalls":8,"label":"loose"}' --report
+
+  Compare: seed v1.0.0
+  baseline  baseline  agg 86.8%  pass 66.7%  (seed-1781602238071-79bcbd9f)
+  candidate loose  agg 79.2%  pass 62.5%  (seed-1781602238191-64135cf7)
+  ▼ aggregate -7.6pp   pass-rate -4.2pp
+  ⚠ REGRESSIONS (1):
+    ✗   tool-under-budget-pass -50.0pp  [tool-call-budget pass→fail; iteration-budget pass→fail]
+  json:   /Users/rahulbhardwaj/Documents/Personal/Projects/agentrie/evals/reports/compare-seed-1781602238071-79bcbd9f-vs-seed-1781602238191-64135cf7.json
+  report: /Users/rahulbhardwaj/Documents/Personal/Projects/agentrie/evals/reports/compare-seed-1781602238071-79bcbd9f-vs-seed-1781602238191-64135cf7.html
+  ✗ compare gate FAILED (exit 2):
+    - 1 case regression(s): tool-under-budget-pass
+
+[exit 2]  → compare gate failed. Exit contract: 0 pass · 1 error · 2 compare-gate · 3 run-gate

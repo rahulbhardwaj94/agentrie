@@ -1,0 +1,25 @@
+# ── Example A: a normal run completes cleanly ──────────────────────────
+$ curl -s localhost:3000/agent/run -d '{"sessionId":"demo-a","prompt":"Explain token-aware context windows in one line."}'
+
+{
+  "status": "completed",
+  "sessionId": "demo-a",
+  "answer": "Fake answer to: Explain token-aware context windows in one line.",
+  "iterations": 1,
+  "toolCalls": 0
+}
+
+# ── Example B: a runaway tool loop is capped by the Phase 0 guardrail ──
+$ curl -s localhost:3000/agent/run -d '{"sessionId":"demo-b","prompt":"use tool: echo {\"message\":\"hi\"}"}'
+
+{
+  "status": "max_iterations",
+  "sessionId": "demo-b",
+  "answer": "Calling tool echo.",
+  "iterations": 10,
+  "toolCalls": 10
+}
+
+# status=max_iterations → AGENT_MAX_ITERATIONS/AGENT_MAX_TOOL_CALLS guardrail
+# stopped the loop at 10 instead of running forever. A structured result,
+# never an exception.

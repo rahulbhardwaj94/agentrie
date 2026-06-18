@@ -1,0 +1,12 @@
+$ LLM_CONTEXT_LIMIT=2000 npm run demo
+
+Context limit=2000 tokens; summarize at 80% (=1600). Tip: LLM_CONTEXT_LIMIT=2000 for a quick demo.
+Turn 1: status=completed iterations=1 windowTokens=27
+Turn 2: status=completed iterations=1 windowTokens=41
+Turn 3: status=completed iterations=1 windowTokens=55
+Turn 4: status=completed iterations=1 windowTokens=74
+Turn 5: status=completed iterations=1 windowTokens=94
+Turn 6: status=completed iterations=1 windowTokens=109
+[summarizer] Summarized 3 messages for demo-1781601951727; window now 118 tokens
+Final window: 5 messages, 118 tokens
+Pinned summary present (53 tokens).

@@ -1,0 +1,163 @@
+{
+  "id": "seed",
+  "version": "1.0.0",
+  "description": "Deterministic seed dataset exercising the FakeLlmProvider end-to-end. Plain prompts return 'Fake answer to: <prompt>' and complete in one iteration; 'use tool: <name> {json}' prompts drive real tool calls until a guardrail trips. Includes intentional failures (outcome + trace-derived) so the aggregate is never trivially 100%.",
+  "cases": [
+    {
+      "id": "qa-greeting",
+      "input": { "prompt": "Say hello to the team" },
+      "expected": { "contains": ["Fake answer to: Say hello"], "status": "completed" },
+      "tags": ["qa", "pass"]
+    },
+    {
+      "id": "qa-exact",
+      "input": { "prompt": "ping" },
+      "expected": { "equals": "Fake answer to: ping" },
+      "tags": ["qa", "exact", "pass"]
+    },
+    {
+      "id": "qa-contains-multi",
+      "input": { "prompt": "Explain distributed tracing" },
+      "expected": { "contains": ["Fake answer", "distributed tracing"] },
+      "tags": ["qa", "pass"]
+    },
+    {
+      "id": "qa-system-prompt",
+      "input": { "prompt": "Follow the house style", "system": "You are terse." },
+      "expected": { "contains": ["Fake answer"], "status": "completed" },
+      "tags": ["qa", "system", "pass"]
+    },
+    {
+      "id": "qa-long",
+      "input": { "prompt": "Give me a thorough overview of event-driven orchestration across SQS and SNS with retries and DLQs" },
+      "expected": { "contains": ["Fake answer"] },
+      "tags": ["qa", "pass"]
+    },
+    {
+      "id": "numeric-total-pass",
+      "input": { "prompt": "After reconciliation the computed total is 42" },
+      "expected": { "numeric": { "value": 42, "tolerance": 0.5 } },
+      "tags": ["numeric", "pass"]
+    },
+    {
+      "id": "numeric-tolerance-pass",
+      "input": { "prompt": "Median request latency was about 119" },
+      "expected": { "numeric": { "value": 120, "tolerance": 2 } },
+      "tags": ["numeric", "pass"]
+    },
+    {
+      "id": "status-completed-pass",
+      "input": { "prompt": "What is the forecast" },
+      "expected": { "status": "completed" },
+      "tags": ["status", "pass"]
+    },
+    {
+      "id": "multi-criteria-pass",
+      "input": { "prompt": "Status report: 7" },
+      "expected": { "contains": ["Fake answer"], "numeric": { "value": 7, "tolerance": 0 }, "status": "completed" },
+      "tags": ["multi", "pass"]
+    },
+    {
+      "id": "rubric-pass",
+      "input": { "prompt": "Summarize the onboarding document" },
+      "expected": { "rubric": "The answer should be a concise, faithful summary of the onboarding document.", "contains": ["Fake answer"] },
+      "tags": ["rubric", "judge", "pass"]
+    },
+    {
+      "id": "iteration-budget-pass",
+      "input": { "prompt": "A simple question with no tools" },
+      "expected": { "status": "completed" },
+      "constraints": { "maxIterations": 3 },
+      "tags": ["trace", "iteration-budget", "pass"]
+    },
+    {
+      "id": "tool-budget-zero-pass",
+      "input": { "prompt": "Answer directly, no tools" },
+      "expected": { "status": "completed" },
+      "constraints": { "maxToolCalls": 0 },
+      "tags": ["trace", "tool-budget", "pass"]
+    },
+    {
+      "id": "token-budget-pass",
+      "input": { "prompt": "short" },
+      "expected": { "status": "completed" },
+      "constraints": { "maxTokens": 100000 },
+      "tags": ["trace", "token-budget", "pass"]
+    },
+    {
+      "id": "combined-budget-pass",
+      "input": { "prompt": "Plain analysis, stay within budget" },
+      "expected": { "status": "completed" },
+      "constraints": { "maxIterations": 2, "maxToolCalls": 0, "maxTokens": 100000 },
+      "tags": ["trace", "pass"]
+    },
+    {
+      "id": "tool-under-budget-pass",
+      "input": {
+        "prompt": "use tool: echo {\"message\":\"hi\"}",
+        "guardrails": { "maxToolCalls": 1 }
+      },
+      "expected": { "status": "max_tool_calls" },
+      "constraints": { "maxToolCalls": 1, "maxIterations": 5 },
+      "tags": ["trace", "tool", "pass"]
+    },
+    {
+      "id": "no-error-spans-pass",
+      "input": { "prompt": "A clean run with no errors" },
+      "expected": { "status": "completed" },
+      "tags": ["trace", "no-error", "pass"]
+    },
+    {
+      "id": "contains-fail",
+      "input": { "prompt": "What is the capital of France" },
+      "expected": { "contains": ["Paris"], "status": "completed" },
+      "tags": ["qa", "fail", "intentional"]
+    },
+    {
+      "id": "exact-fail",
+      "input": { "prompt": "hello world" },
+      "expected": { "equals": "Goodbye, world" },
+      "tags": ["exact", "fail", "intentional"]
+    },
+    {
+      "id": "numeric-fail",
+      "input": { "prompt": "We sold 3 units this quarter" },
+      "expected": { "numeric": { "value": 1000, "tolerance": 1 } },
+      "tags": ["numeric", "fail", "intentional"]
+    },
+    {
+      "id": "status-mismatch-fail",
+      "input": { "prompt": "use tool: echo {\"message\":\"x\"}" },
+      "expected": { "status": "completed" },
+      "tags": ["status", "fail", "intentional"]
+    },
+    {
+      "id": "forbidden-tool-fail",
+      "input": { "prompt": "use tool: echo {\"message\":\"secret\"}" },
+      "expected": { "status": "max_iterations" },
+      "constraints": { "mustNotCallTools": ["echo"] },
+      "tags": ["trace", "forbidden-tool", "fail", "intentional"]
+    },
+    {
+      "id": "tool-budget-fail",
+      "input": { "prompt": "use tool: echo {\"message\":\"spam\"}" },
+      "expected": { "status": "max_iterations" },
+      "constraints": { "maxToolCalls": 2 },
+      "tags": ["trace", "tool-budget", "fail", "intentional"]
+    },
+    {
+      "id": "iteration-budget-fail",
+      "input": { "prompt": "use tool: echo {\"message\":\"loop\"}" },
+      "expected": { "status": "max_iterations" },
+      "constraints": { "maxIterations": 3 },
+      "tags": ["trace", "iteration-budget", "fail", "intentional"]
+    },
+    {
+      "id": "token-budget-fail",
+      "input": { "prompt": "use tool: echo {\"message\":\"a very wordy repeated payload that inflates token usage across iterations\"}" },
+      "expected": { "status": "max_iterations" },
+      "constraints": { "maxTokens": 50 },
+      "tags": ["trace", "token-budget", "fail", "intentional"]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+$ curl -s 'http://localhost:16686/api/traces?service=agentrie&limit=1' | jq ...
+
+# Span-type counts in one agent run (the trace tree Jaeger renders):
+  10 x  agent.iteration
+  1 x  agent.run
+  10 x  agent.tool_call
+  10 x  llm.complete
+
+# GenAI semantic-convention attributes on an llm.complete span:
+{
+  "gen_ai.request.model": "fake-claude-opus-4-8",
+  "gen_ai.system": "fake",
+  "gen_ai.usage.input_tokens": 47,
+  "gen_ai.usage.output_tokens": 5
+}
+
+# GenAI tool attribute on an agent.tool_call span:
+{
+  "gen_ai.tool.name": "echo"
+}
+
+# View it visually: http://localhost:16686  → service 'agentrie'
