@@ -44,6 +44,40 @@ Real captured output from a live local run — full walkthrough with every step 
 
 ## What it does
 
+### The big picture (in plain English)
+
+You send the agent a question. It loops: **look at the conversation so far → ask the
+model what to do → if the model wants to use a tool, run it safely → repeat until
+there's an answer.** Along the way it remembers everything, keeps memory from
+overflowing, and records every step so you can see exactly what happened.
+
+```mermaid
+flowchart TD
+    User([You]) -->|"POST /agent/run"| Agent["🔁 Agent Runner<br/>the decision loop"]
+    Agent <-->|"reads & writes the conversation"| Redis[("⚡ Redis<br/>short-term memory")]
+    Agent -->|"asks: what should I do next?"| LLM["🧠 LLM<br/>Fake (offline) or Claude"]
+    Agent -->|"runs only safe, allow-listed actions"| Tools["🔧 Tool Registry"]
+    Redis -->|"every message is also saved"| Mongo[("📦 MongoDB<br/>permanent record")]
+    Redis -.->|"when memory ~80% full"| Summ["📝 Summarizer<br/>compresses old messages"]
+    Agent ==>|"records every step"| Otel["🔭 OpenTelemetry<br/>traces · metrics · logs"]
+```
+
+**Step by step:**
+
+1. **You** call `POST /agent/run` with a question.
+2. The **Agent Runner** pulls the recent conversation from **Redis** (fast memory)
+   and asks the **LLM** what to do — guardrails cap how long it can loop.
+3. If the model picks a **tool**, the registry checks it's allowed, validates the
+   inputs, runs it, and feeds the result back into the loop.
+4. Every message is also written to **MongoDB** — the permanent, trustworthy record.
+5. When Redis memory fills to **~80%**, a background **Summarizer** squashes the
+   oldest messages into one short summary so the conversation can keep going.
+6. Everything the agent does becomes an **OpenTelemetry** trace — so you can *see*
+   what happened, and the eval layer can *score* it.
+
+<details>
+<summary>Detailed component view (ASCII)</summary>
+
 ```
             POST /agent/run
                   │
@@ -65,6 +99,10 @@ Real captured output from a live local run — full walkthrough with every step 
         │ allowlist + Zod    │                        └──────────────────────┘
         └───────────────────┘
 ```
+
+</details>
+
+The same three points, with the technical detail:
 
 - **Mongo is the source of truth**; Redis is the hot, token-aware sliding window.
 - When active-context tokens cross **80% of the model's context limit**, an
