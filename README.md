@@ -6,13 +6,6 @@ A distributed, multi-agent **orchestration & observability platform** built on
 NestJS 11, AWS SQS/SNS (via LocalStack locally), Redis, MongoDB, and
 OpenTelemetry.
 
-This pass delivers **Phase 0 (the agent decision loop)** and **Phase 1 (state
-management)** fully implemented and runnable, with **Phases 2–4** as compiling
-scaffolds with complete interfaces and DI wiring, plus a **Phase 5 eval & scoring
-layer** that closes the loop. See
-[IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for the precise real-vs-stubbed
-breakdown and what to build next.
-
 > **Traced + measured: see what the agent did, and prove whether it's good.**
 > The observability layer shows you *what happened* on every run; the eval layer
 > turns those same spans into *scores* — running the agent against datasets,
@@ -24,21 +17,12 @@ breakdown and what to build next.
 > ([sample run report](./evals/sample-run-report.html),
 > [sample compare report](./evals/sample-compare-report.html)).
 
----
+![the eval suite scoring the agent](./demo/screenshots/eval-run.gif)
 
-## See it run
-
-Real captured output from a live local run — full walkthrough with every step in
-[**DEMO.md**](./DEMO.md). Two highlights:
-
-**The eval layer scores the unmodified agent** (8 of 24 cases fail by design):
-
-![eval run](./demo/screenshots/06-eval-run.png)
-
-**Every run is a trace** — `agent.run` over nested `agent.iteration` →
-`llm.complete` / `agent.tool_call` spans, in the Jaeger UI:
-
-![jaeger trace](./demo/screenshots/08-jaeger-trace.png)
+> *One command, captured live: the eval suite runs the **unmodified** agent against
+> a dataset and scores every case — 8 of the 24 fail by design, so the aggregate is
+> honestly under 100%. Full walkthrough with more captures in
+> [**DEMO.md**](./DEMO.md).*
 
 ---
 
@@ -111,6 +95,23 @@ The same three points, with the technical detail:
 - Every LLM/tool/iteration emits an **OpenTelemetry span** with GenAI
   semantic-convention attributes; trace context propagates SNS→SQS via W3C
   `traceparent` in message attributes.
+
+---
+
+## See it run
+
+The GIF up top is one command (`npm run eval -- run seed`); the
+[**DEMO.md**](./DEMO.md) walkthrough captures every step with screenshots. And
+because every run is also a **trace**, you can open the exact span tree that
+explains a result — `agent.run` over nested `agent.iteration` → `llm.complete` /
+`agent.tool_call`, here in the Jaeger UI:
+
+![jaeger trace](./demo/screenshots/08-jaeger-trace.png)
+
+> **Status:** Phases 0–5 are implemented and runnable offline; what remains is
+> deploy-time hardening plus a few eval follow-ons. See
+> [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for the precise
+> real-vs-stubbed breakdown.
 
 ---
 
